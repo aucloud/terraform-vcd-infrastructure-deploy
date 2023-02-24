@@ -1,0 +1,27 @@
+#cloud-config
+preserve_hostname: false
+hostname: ${hostname}
+fqdn: ${hostname}.example.com
+
+packages_update: true
+packages_upgrade: true
+
+packages:
+ - golang
+ - iftop
+ - iotop 
+ - sysstat 
+ - open-vm-tools 
+ - rsyslog 
+ - net-tools
+ - traceroute
+
+users:
+  - name: ${linux_user}
+    lock_passwd: false
+    passwd: ${linux_password}
+    sudo:  ALL=(ALL) NOPASSWD:ALL
+runcmd:
+  - [cat, /var/log/cloud-init-output.log]
+
+final_message: "System initialisation finished after $UPTIME seconds"

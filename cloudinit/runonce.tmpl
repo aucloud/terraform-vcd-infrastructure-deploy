@@ -1,0 +1,2 @@
+@echo off
+powershell.exe "set-item wsman:\localhost\client\trustedhosts -value '${application_subnet}.*,${database_subnet}.*,${jumphost_subnet}.*' -Force"
