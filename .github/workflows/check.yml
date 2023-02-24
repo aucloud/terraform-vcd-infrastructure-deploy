@@ -1,0 +1,65 @@
+---
+name: Check terraform code
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  # Chosen to have each of the jobs independent. Bulkier but faster.
+  validate_code:
+    runs-on: ubuntu-latest # github.com runners.
+    environment: demo
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      TF_VAR_user: ${{ secrets.VCD_USER }}
+      TF_VAR_password: ${{ secrets.VCD_PASSWORD }}
+
+      TF_VAR_win_password: ${{ secrets.WIN_PASSWORD }}
+      TF_VAR_linux_user: ${{ secrets.LINUX_USER }}
+      TF_VAR_linux_password_cleartext: ${{ secrets.LINUX_PASSWORD }}
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: "1.3.6"
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "1.19.5"
+      
+      - uses: actions/setup-node@v3  
+        with:
+          node-version: 16
+
+      # Next 3 steps run tflint which enforces style guides
+      - uses: terraform-linters/setup-tflint@v2
+        name: Setup TFLint
+        with:
+          tflint_version: v0.36.2 # latest
+
+      - name: Init TFLint
+        run: tflint --init
+
+      - name: Run TFLint 
+        run: tflint -f default
+
+      - name: Terraform Init
+        run: terraform init -backend-config=backend.hcl
+
+      # This enforces consistent formatting of the terraform codebase. 
+      - name: Terraform format
+        run: terraform fmt -recursive -check
+
+
+      # This checks for bad references 
+      - name: Terraform validate
+        run: terraform validate
+
+      # This step reaches out to the apis which you are trying to configure and attempts to measure the difference.
+      # This step *WILL* fail if the network is unreachable
+      - name: Terraform plan
+        run: terraform plan
