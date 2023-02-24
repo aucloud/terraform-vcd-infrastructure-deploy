@@ -1,0 +1,42 @@
+---
+name: Destroy infrastructure
+
+on:
+  # this is only manually triggered.
+  workflow_dispatch:
+
+jobs:
+  stage:
+    runs-on: ubuntu-latest # github.com runners.
+    environment: demo
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      TF_VAR_user: ${{ secrets.VCD_USER }}
+      TF_VAR_password: ${{ secrets.VCD_PASSWORD }}
+
+      TF_VAR_win_password: ${{ secrets.WIN_PASSWORD }}
+      TF_VAR_linux_user: ${{ secrets.LINUX_USER }}
+      TF_VAR_linux_password_cleartext: ${{ secrets.LINUX_PASSWORD }}
+      
+    steps:
+      - uses: actions/checkout@v3
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: "1.3.6"
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "1.19.5"
+      
+      - uses: actions/setup-node@v3  
+        with:
+          node-version: 16
+    
+      - name: Terraform Init
+        run: terraform init -backend-config=backend.hcl
+
+      # This destroys everything. use -target to destroy specific resources in workflow.
+      - name: Terraform destroy
+        run: terraform destroy -auto-approve
