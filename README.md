@@ -18,6 +18,8 @@ This system is simple, however, it is not designed for production use:
 
 
 ## How it works
+![](./assets/architecture.png)
+
 The [github workflows](.github/workflows), are designed to execute a simple trunk based development workflow:
 
 - All of the workflows can be triggered manually
@@ -108,6 +110,3 @@ If a destroy run fails:
    1. Manually delete / cleanup resources on the target system.
    1. Remove the state file manually (delete) from object storage.
 
-## How it works
-
-![](./assets/architecture.png)
