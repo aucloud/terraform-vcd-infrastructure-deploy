@@ -18,6 +18,7 @@ This system is simple, however, it is not designed for production use:
 
 
 ## How it works
+
 ![](./assets/architecture.png)
 
 The [github workflows](.github/workflows), are designed to execute a simple trunk based development workflow:
