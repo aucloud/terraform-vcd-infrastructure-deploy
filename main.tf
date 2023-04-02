@@ -127,6 +127,7 @@ resource "vcd_vapp_vm" "application_utility_linux" {
 
   ]
   name             = var.application_utility_linux
+  computer_name    = var.application_utility_linux
   vapp_name        = vcd_vapp.application_utility.name
   vapp_template_id = data.vcd_catalog_vapp_template.template_linux.id
 
